@@ -1,0 +1,8 @@
+    4   "NegLargeDark"     1       "NegLargeDark" 
+    5   "NegSmallDark"     2       "NegSmallDark" 
+    6 "NegLargeBright"     3     "NegLargeBright" 
+    7 "NegSmallBright"     4     "NegSmallBright" 
+    8  "NeutLargeDark"     5      "NeutLargeDark" 
+    9  "NeutSmallDark"     6      "NeutSmallDark" 
+   10 "NeutLargeBright"     7    "NeutLargeBright"
+   11 "NeutSmallBright"     8    "NeutSmallBright"
