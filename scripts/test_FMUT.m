@@ -4,7 +4,7 @@
 rng(9001); % seed for pseudo-random number generator (it's over 9000!)
 
 % functions & toolboxes
-addpath '/home/aschetti/Documents/Projects/test_FMUT/scripts/functions/'; % various functions
+addpath '/home/aschetti/Documents/Projects/test_FMUT/scripts/functions/'; % misc functions
 addpath '/home/aschetti/Documents/MATLAB/toolboxes/FMUT_0.5.1'; % Factorial Mass Univariate ERP Toolbox (FMUT)
 addpath '/home/aschetti/Documents/MATLAB/toolboxes/eeglab2020_0'; % EEGLAB
 
@@ -127,7 +127,7 @@ for isub = 1:numel(filenames_bdf) % loop through participants
     
 end
 
-%% Mass Univariate Toolbox: data preparation
+%% FMUT: DATA PREPARATION
 
 % prepare file list for GND file
 filenames_erp = dir([pathdata_mass '*.erp']); % read file names in folder path (puts it in a structure)
@@ -148,7 +148,7 @@ save([pathdata_mass 'test_FMUT.GND']); % save GND file
 % headinfo(GND) % see channels and bins of GND file
 % gui_erp(GND) % check the data
 
-%% Mass Univariate Toolbox: Analysis
+%% FMUT: FACTORIAL ANALYSIS
 
 % from the FMUT tutorial
 % (https://github.com/ericcfields/FMUT/wiki/Mass-univariate-statistics-and-corrections#permutation-based-fmax):
@@ -176,6 +176,8 @@ save([pathdata_mass 'test_FMUT.GND']); % save GND file
 % for (spatially and temporally) widely distributed effects,
 % but will have greater power for focal effects (see Simulation Results and Groppe et al., 2011b).
 
+load([pathdata_mass 'test_FMUT.GND'], '-mat'); % load GND file
+
 GND = FmaxGND(GND, ...
     'bins', 1:8, ... % use all bins
     'factor_names', {'Size' 'Contrast' 'Emotion'}, ... % names of factors in fastest to slowest moving order
@@ -187,11 +189,29 @@ GND = FmaxGND(GND, ...
 
 save([pathdata_mass 'test_FMUT.GND']); % save GND file
 
-load([pathdata_mass 'test_FMUT.GND'], '-mat'); % load GND file
-
 report_results(GND, 1) % show results in command window
 
 % To interpret the results,
 % see https://github.com/ericcfields/FMUT/wiki/Using-FMUT#output
+
+%% FMUT: PAIRWISE FOLLOW-UP CONTRASTS
+
+load([pathdata_mass 'test_FMUT.GND'], '-mat'); % load GND file
+
+% TRIGGERS:
+% 1: negativeLargeDark
+% 2: negativeSmallDark
+% 3: negativeLargeBright
+% 4: negativeSmallBright
+% 5: neutralLargeDark
+% 6: neutralSmallDark
+% 7: neutralLargeBright
+% 8: neutralSmallBright
+
+% bins
+% main effect of emotion
+GND = bin_mean(GND, [1:4], 'negative'); % bin 9
+
+% ERROR: Unrecognized function or variable 'bin_mean'.
 
 %%
