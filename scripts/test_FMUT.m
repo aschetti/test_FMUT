@@ -5,8 +5,9 @@ rng(9001); % seed for pseudo-random number generator (it's over 9000!)
 
 % functions & toolboxes
 addpath '/home/aschetti/Documents/Projects/test_FMUT/scripts/functions/'; % misc functions
-addpath '/home/aschetti/Documents/MATLAB/toolboxes/FMUT_0.5.1'; % Factorial Mass Univariate ERP Toolbox (FMUT)
 addpath '/home/aschetti/Documents/MATLAB/toolboxes/eeglab2020_0'; % EEGLAB
+addpath '/home/aschetti/Documents/MATLAB/toolboxes/dmgroppe-Mass_Univariate_ERP_Toolbox-d1e60d4'; % Mass Univariate ERP Toolbox (MUT)
+addpath '/home/aschetti/Documents/MATLAB/toolboxes/FMUT_0.5.1'; % Factorial Mass Univariate ERP Toolbox (FMUT)
 
 % directories
 path_project = '/home/aschetti/Documents/Projects/test_FMUT/'; % project directory
@@ -178,12 +179,19 @@ save([pathdata_mass 'test_FMUT.GND']); % save GND file
 
 load([pathdata_mass 'test_FMUT.GND'], '-mat'); % load GND file
 
+% headinfo(GND) % see channels and bins of GND file
+% gui_erp(GND) % check the data
+
+% analysis parameters
+numb_perm = 5000;
+alpha_perm = 0.05;
+
 GND = FmaxGND(GND, ...
     'bins', 1:8, ... % use all bins
     'factor_names', {'Size' 'Contrast' 'Emotion'}, ... % names of factors in fastest to slowest moving order
     'factor_levels', [2, 2, 2], ...
-    'n_perm', 5000, ...
-    'alpha', 0.05, ...
+    'n_perm', numb_perm, ...
+    'alpha', alpha_perm, ...
     'plot_raster', 'no', ...
     'save_GND', 'no');
 
@@ -198,7 +206,13 @@ report_results(GND, 1) % show results in command window
 
 load([pathdata_mass 'test_FMUT.GND'], '-mat'); % load GND file
 
-% TRIGGERS:
+% headinfo(GND) % see channels and bins of GND file
+
+% analysis parameters
+numb_perm = 5000;
+alpha_perm = 0.05;
+
+% BINS:
 % 1: negativeLargeDark
 % 2: negativeSmallDark
 % 3: negativeLargeBright
@@ -208,10 +222,69 @@ load([pathdata_mass 'test_FMUT.GND'], '-mat'); % load GND file
 % 7: neutralLargeBright
 % 8: neutralSmallBright
 
-% bins
-% main effect of emotion
-GND = bin_mean(GND, [1:4], 'negative'); % bin 9
+% average bins for main effects
+GND = bin_mean(GND, 1, 5, 'large dark'); % bin 9
+GND = bin_mean(GND, 3, 7, 'large bright'); % bin 10
+GND = bin_mean(GND, 2, 6, 'small dark'); % bin 11
+GND = bin_mean(GND, 4, 8, 'small bright'); % bin 12
+GND = bin_mean(GND, 1, 2, 'negative dark'); % bin 13
+GND = bin_mean(GND, 3, 4, 'negative bright'); % bin 14
+GND = bin_mean(GND, 5, 6, 'neutral dark'); % bin 15
+GND = bin_mean(GND, 7, 8, 'neutral bright'); % bin 16
+GND = bin_mean(GND, 9, 10, 'large'); % bin 17
+GND = bin_mean(GND, 11, 12, 'small'); % bin 18
+GND = bin_mean(GND, 9, 11, 'dark'); % bin 19
+GND = bin_mean(GND, 10, 12, 'bright'); % bin 20
+GND = bin_mean(GND, 13, 14, 'negative'); % bin 21
+GND = bin_mean(GND, 15, 16, 'neutral'); % bin 22
 
-% ERROR: Unrecognized function or variable 'bin_mean'.
+% main effect of size
+GND = bin_dif(GND, 17, 18, 'large minus small'); % bin 23
+
+GND = tmaxGND(GND, ...
+    23, ... % large minus small
+    'tail', 0, ... % two-tailed test
+    'alpha', alpha_perm, ... % alpha
+    'n_perm', numb_perm, ... % number of permutations
+    'null_mean', 0, ...
+    'plot_gui', 'no', ...
+    'plot_raster', 'no', ...
+    'plot_mn_topo', 'no', ...
+    'output_file', [pathdata_mass 'output/test_FMUT_main_size.txt'], ...
+    'save_GND', 'no');
+
+% main effect of contrast
+GND = bin_dif(GND, 19, 20, 'dark minus bright'); % bin 24
+
+GND = tmaxGND(GND, ...
+    24, ... % dark minus bright
+    'tail', 0, ... % two-tailed test
+    'alpha', alpha_perm, ... % alpha
+    'n_perm', numb_perm, ... % number of permutations
+    'null_mean', 0, ...
+    'plot_gui', 'no', ...
+    'plot_raster', 'no', ...
+    'plot_mn_topo', 'no', ...
+    'output_file', [pathdata_mass 'output/test_FMUT_main_contrast.txt'], ...
+    'save_GND', 'no');
+
+% main effect of emotion
+GND = bin_dif(GND, 21, 22, 'negative minus neutral'); % bin 25
+
+GND = tmaxGND(GND, ...
+    25, ... % negative minus neutral
+    'tail', 0, ... % two-tailed test
+    'alpha', alpha_perm, ... % alpha
+    'n_perm', numb_perm, ... % number of permutations
+    'null_mean', 0, ...
+    'plot_gui', 'no', ...
+    'plot_raster', 'no', ...
+    'plot_mn_topo', 'no', ...
+    'output_file', [pathdata_mass 'output/test_FMUT_main_emotion.txt'], ...
+    'save_GND', 'no');
+
+save([pathdata_mass 'test_FMUT.GND']); % save GND file
+
+% gui_erp(GND) % check the data
 
 %%
